@@ -30,7 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // Sementara hanya notifikasi, halaman kuis dibuat di tahap berikutnya
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Siap, ${_nameController.text.trim()}! Kuis segera dimulai...'),
+        content: Text(
+          'Siap, ${_nameController.text.trim()}! Kuis segera dimulai...',
+        ),
       ),
     );
   }
