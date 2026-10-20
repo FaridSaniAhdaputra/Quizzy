@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../utils/responsive.dart';
+import '../widgets/custom_button.dart';
+import 'quiz_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,12 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
-    // Sementara hanya notifikasi, halaman kuis dibuat di tahap berikutnya
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Siap, ${_nameController.text.trim()}! Kuis segera dimulai...',
-        ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QuizScreen(userName: _nameController.text.trim()),
       ),
     );
   }
@@ -101,26 +101,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(height: r.hp(0.08)),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _startQuiz,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(r.sp(12)),
-                      ),
-                    ),
-                    child: Text(
-                      'Mulai Kuis',
-                      style: TextStyle(
-                        fontSize: r.sp(18),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                CustomButton(
+                  text: 'Mulai Kuis',
+                  fontSize: 18,
+                  onPressed: _startQuiz,
                 ),
               ],
             ),
