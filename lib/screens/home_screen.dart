@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../controllers/quiz_controller.dart';
 import '../data/quiz_data.dart';
+import '../main.dart'; // Akses themeNotifier
 import '../utils/responsive.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/responsive_center.dart';
@@ -127,6 +128,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      IconButton(
+                        icon: Icon(
+                          isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                          color: primaryColor,
+                          size: r.sp(28),
+                        ),
+                        onPressed: () {
+                          themeNotifier.value = isDarkMode
+                              ? ThemeMode.light
+                              : ThemeMode.dark;
+                        },
+                      ),
                       IconButton(
                         icon: Icon(
                           Icons.help_outline,
