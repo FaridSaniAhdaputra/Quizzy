@@ -5,6 +5,7 @@ import '../data/quiz_data.dart';
 import '../utils/responsive.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/option_button.dart';
+import '../widgets/responsive_center.dart';
 import 'result_screen.dart';
 
 class QuizScreen extends StatelessWidget {
@@ -28,6 +29,7 @@ class QuizScreen extends StatelessWidget {
     final primaryColor = Theme.of(context).primaryColor;
     final textColor = Theme.of(context).colorScheme.onSurface;
 
+    // Halaman ikut dibangun ulang setiap progres di controller berubah.
     return ListenableBuilder(
       listenable: quizController,
       builder: (context, _) {
@@ -49,74 +51,76 @@ class QuizScreen extends StatelessWidget {
             centerTitle: true,
           ),
           body: SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(r.wp(0.06)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Hai, ${quizController.userName}!',
-                    style: TextStyle(
-                      fontSize: r.sp(16),
-                      color: textColor.withValues(alpha: 0.7),
+            child: ResponsiveCenter(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(r.wp(0.06)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Hai, ${quizController.userName}!',
+                      style: TextStyle(
+                        fontSize: r.sp(16),
+                        color: textColor.withValues(alpha: 0.7),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: r.hp(0.015)),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(r.sp(8)),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: r.sp(8),
-                      color: primaryColor,
-                      backgroundColor: primaryColor.withValues(alpha: 0.15),
-                    ),
-                  ),
-                  SizedBox(height: r.hp(0.04)),
-                  Text(
-                    question.questionText,
-                    style: TextStyle(
-                      fontSize: r.sp(22),
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: r.hp(0.04)),
-                  for (int i = 0; i < question.options.length; i++)
-                    Padding(
-                      padding: EdgeInsets.only(bottom: r.hp(0.02)),
-                      child: OptionButton(
-                        text: question.options[i],
-                        selected: quizController.selectedAnswer == i,
-                        onPressed: () => quizController.selectAnswer(i),
+                    SizedBox(height: r.hp(0.015)),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(r.sp(8)),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: r.sp(8),
+                        color: primaryColor,
+                        backgroundColor: primaryColor.withValues(alpha: 0.15),
                       ),
                     ),
-                  SizedBox(height: r.hp(0.01)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          text: 'Sebelumnya',
-                          onPressed: quizController.isFirst
-                              ? null
-                              : quizController.previous,
+                    SizedBox(height: r.hp(0.04)),
+                    Text(
+                      question.questionText,
+                      style: TextStyle(
+                        fontSize: r.sp(22),
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: r.hp(0.04)),
+                    for (int i = 0; i < question.options.length; i++)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: r.hp(0.02)),
+                        child: OptionButton(
+                          text: question.options[i],
+                          selected: quizController.selectedAnswer == i,
+                          onPressed: () => quizController.selectAnswer(i),
                         ),
                       ),
-                      SizedBox(width: r.wp(0.04)),
-                      Expanded(
-                        child: CustomButton(
-                          text: quizController.isLast
-                              ? 'Selesai'
-                              : 'Selanjutnya',
-                          onPressed: quizController.selectedAnswer == null
-                              ? null
-                              : () => _onNext(context),
+                    SizedBox(height: r.hp(0.01)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomButton(
+                            text: 'Sebelumnya',
+                            onPressed: quizController.isFirst
+                                ? null
+                                : quizController.previous,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        SizedBox(width: r.wp(0.04)),
+                        Expanded(
+                          child: CustomButton(
+                            text: quizController.isLast
+                                ? 'Selesai'
+                                : 'Selanjutnya',
+                            onPressed: quizController.selectedAnswer == null
+                                ? null
+                                : () => _onNext(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
