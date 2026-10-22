@@ -1,22 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/quiz_controller.dart';
 import '../utils/responsive.dart';
 import '../widgets/custom_button.dart';
 import 'home_screen.dart';
 
 class ResultScreen extends StatelessWidget {
-  final String userName;
-  final int correctCount;
-  final int total;
-
-  const ResultScreen({
-    super.key,
-    required this.userName,
-    required this.correctCount,
-    required this.total,
-  });
-
-  int get score => (correctCount * 100 / total).round();
+  const ResultScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +18,7 @@ class ResultScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Center(
+          // Bisa di-scroll agar tidak overflow saat layar landscape
           child: SingleChildScrollView(
             padding: EdgeInsets.all(r.wp(0.06)),
             child: Column(
@@ -51,7 +42,7 @@ class ResultScreen extends StatelessWidget {
                 ),
                 SizedBox(height: r.hp(0.01)),
                 Text(
-                  'Terima kasih telah bermain,\n$userName!',
+                  'Terima kasih telah bermain,\n${quizController.userName}!',
                   style: TextStyle(
                     fontSize: r.sp(18),
                     color: textColor.withValues(alpha: 0.7),
@@ -78,7 +69,7 @@ class ResultScreen extends StatelessWidget {
                       ),
                       SizedBox(height: r.hp(0.01)),
                       Text(
-                        '$score',
+                        '${quizController.score}',
                         style: TextStyle(
                           fontSize: r.sp(60),
                           fontWeight: FontWeight.bold,
@@ -86,7 +77,7 @@ class ResultScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '$correctCount benar dari $total soal',
+                        '${quizController.correctCount} benar dari ${quizController.total} soal',
                         style: TextStyle(
                           fontSize: r.sp(14),
                           color: textColor.withValues(alpha: 0.7),
@@ -99,6 +90,7 @@ class ResultScreen extends StatelessWidget {
                 CustomButton(
                   text: 'Kembali ke Beranda',
                   onPressed: () {
+                    quizController.reset();
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(

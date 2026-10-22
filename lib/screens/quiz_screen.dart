@@ -1,56 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/quiz_controller.dart';
 import '../data/quiz_data.dart';
 import '../utils/responsive.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/option_button.dart';
 import 'result_screen.dart';
 
-class QuizScreen extends StatefulWidget {
-  final String userName;
+class QuizScreen extends StatelessWidget {
+  const QuizScreen({super.key});
 
-  const QuizScreen({super.key, required this.userName});
-
-  @override
-  State<QuizScreen> createState() => _QuizScreenState();
-}
-
-class _QuizScreenState extends State<QuizScreen> {
-  int _currentIndex = 0;
-  // Menyimpan jawaban: nomor soal -> index pilihan
-  final Map<int, int> _answers = {};
-
-  bool get _isFirst => _currentIndex == 0;
-  bool get _isLast => _currentIndex == quizData.length - 1;
-  int? get _selectedAnswer => _answers[_currentIndex];
-
-  void _selectAnswer(int optionIndex) {
-    setState(() => _answers[_currentIndex] = optionIndex);
-  }
-
-  void _previous() {
-    if (!_isFirst) setState(() => _currentIndex--);
-  }
-
-  void _onNext() {
-    if (!_isLast) {
-      setState(() => _currentIndex++);
-      return;
+  void _onNext(BuildContext context) {
+    if (quizController.isLast) {
+      quizController.finish();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ResultScreen()),
+      );
+    } else {
+      quizController.next();
     }
-    int correct = 0;
-    _answers.forEach((index, answer) {
-      if (quizData[index].correctAnswerIndex == answer) correct++;
-    });
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultScreen(
-          userName: widget.userName,
-          correctCount: correct,
-          total: quizData.length,
-        ),
-      ),
-    );
   }
 
   @override
@@ -58,88 +27,101 @@ class _QuizScreenState extends State<QuizScreen> {
     final r = Responsive.of(context);
     final primaryColor = Theme.of(context).primaryColor;
     final textColor = Theme.of(context).colorScheme.onSurface;
-    final question = quizData[_currentIndex];
-    final progress = (_currentIndex + 1) / quizData.length;
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: Text(
-          'Soal ${_currentIndex + 1} / ${quizData.length}',
-          style: TextStyle(
-            color: primaryColor,
-            fontWeight: FontWeight.bold,
-            fontSize: r.sp(18),
+    return ListenableBuilder(
+      listenable: quizController,
+      builder: (context, _) {
+        final question = quizData[quizController.currentIndex];
+        final progress =
+            (quizController.currentIndex + 1) / quizController.total;
+
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            title: Text(
+              'Soal ${quizController.currentIndex + 1} / ${quizController.total}',
+              style: TextStyle(
+                color: primaryColor,
+                fontWeight: FontWeight.bold,
+                fontSize: r.sp(18),
+              ),
+            ),
+            centerTitle: true,
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(r.wp(0.06)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Hai, ${widget.userName}!',
-                style: TextStyle(
-                  fontSize: r.sp(16),
-                  color: textColor.withValues(alpha: 0.7),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: r.hp(0.015)),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(r.sp(8)),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: r.sp(8),
-                  color: primaryColor,
-                  backgroundColor: primaryColor.withValues(alpha: 0.15),
-                ),
-              ),
-              SizedBox(height: r.hp(0.04)),
-              Text(
-                question.questionText,
-                style: TextStyle(
-                  fontSize: r.sp(22),
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: r.hp(0.04)),
-              for (int i = 0; i < question.options.length; i++)
-                Padding(
-                  padding: EdgeInsets.only(bottom: r.hp(0.02)),
-                  child: OptionButton(
-                    text: question.options[i],
-                    selected: _selectedAnswer == i,
-                    onPressed: () => _selectAnswer(i),
-                  ),
-                ),
-              SizedBox(height: r.hp(0.01)),
-              Row(
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(r.wp(0.06)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: CustomButton(
-                      text: 'Sebelumnya',
-                      onPressed: _isFirst ? null : _previous,
+                  Text(
+                    'Hai, ${quizController.userName}!',
+                    style: TextStyle(
+                      fontSize: r.sp(16),
+                      color: textColor.withValues(alpha: 0.7),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: r.hp(0.015)),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(r.sp(8)),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: r.sp(8),
+                      color: primaryColor,
+                      backgroundColor: primaryColor.withValues(alpha: 0.15),
                     ),
                   ),
-                  SizedBox(width: r.wp(0.04)),
-                  Expanded(
-                    child: CustomButton(
-                      text: _isLast ? 'Selesai' : 'Selanjutnya',
-                      onPressed: _selectedAnswer == null ? null : _onNext,
+                  SizedBox(height: r.hp(0.04)),
+                  Text(
+                    question.questionText,
+                    style: TextStyle(
+                      fontSize: r.sp(22),
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
                     ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: r.hp(0.04)),
+                  for (int i = 0; i < question.options.length; i++)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: r.hp(0.02)),
+                      child: OptionButton(
+                        text: question.options[i],
+                        selected: quizController.selectedAnswer == i,
+                        onPressed: () => quizController.selectAnswer(i),
+                      ),
+                    ),
+                  SizedBox(height: r.hp(0.01)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          text: 'Sebelumnya',
+                          onPressed: quizController.isFirst
+                              ? null
+                              : quizController.previous,
+                        ),
+                      ),
+                      SizedBox(width: r.wp(0.04)),
+                      Expanded(
+                        child: CustomButton(
+                          text: quizController.isLast
+                              ? 'Selesai'
+                              : 'Selanjutnya',
+                          onPressed: quizController.selectedAnswer == null
+                              ? null
+                              : () => _onNext(context),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

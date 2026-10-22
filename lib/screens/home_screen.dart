@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/quiz_controller.dart';
 import '../utils/responsive.dart';
 import '../widgets/custom_button.dart';
 import 'quiz_screen.dart';
@@ -15,26 +16,39 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _nameController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Jika ada kuis yang belum selesai, tampilkan kembali namanya
+    if (quizController.inProgress) {
+      _nameController.text = quizController.userName;
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
   }
 
   void _startQuiz() {
-    if (_nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan masukkan nama kamu terlebih dahulu!'),
-        ),
-      );
-      return;
+    if (!quizController.inProgress) {
+      if (_nameController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Silakan masukkan nama kamu terlebih dahulu!'),
+          ),
+        );
+        return;
+      }
+      quizController.start(_nameController.text);
     }
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => QuizScreen(userName: _nameController.text.trim()),
-      ),
-    );
+      MaterialPageRoute(builder: (context) => const QuizScreen()),
+    ).then((_) {
+      // Saat kembali dari kuis, perbarui teks tombol (Mulai / Lanjutkan)
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -43,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Theme.of(context).primaryColor;
     final textColor = Theme.of(context).colorScheme.onSurface;
+    final inProgress = quizController.inProgress;
 
     return Scaffold(
       body: SafeArea(
@@ -50,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: r.wp(0.08),
-              vertical: r.hp(0.05),
+              vertical: r.hp(0.03),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,6 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(height: r.hp(0.01)),
                 TextField(
                   controller: _nameController,
+                  // Nama dikunci selama kuis masih berjalan
+                  enabled: !inProgress,
                   style: TextStyle(color: textColor, fontSize: r.sp(16)),
                   decoration: InputDecoration(
                     hintText: 'Masukkan nama...',
@@ -102,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: r.hp(0.08)),
                 CustomButton(
-                  text: 'Mulai Kuis',
+                  text: inProgress ? 'Lanjutkan Kuis' : 'Mulai Kuis',
                   fontSize: 18,
                   onPressed: _startQuiz,
                 ),
