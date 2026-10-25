@@ -82,7 +82,7 @@ tidak memakai database.
 
 | Jenis                 | Link                                                                                                                 |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 🎨 Mockup / Prototype | [Lihat mockup Quizzy](https://www.figma.com/design/JrqERcUUdYIzvHBFUxr7Jy/Untitled?node-id=0-1&t=MnzJxylRM87kTdTC-1) |
+| 🎨 Mockup / Prototype | [Lihat figma Quizzy](https://www.figma.com/design/JrqERcUUdYIzvHBFUxr7Jy/Untitled?node-id=0-1&t=MnzJxylRM87kTdTC-1) |
 
 ---
 
